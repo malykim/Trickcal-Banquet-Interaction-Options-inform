@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Papa from 'papaparse';
-import { User, RefreshCcw, ChevronLeft } from 'lucide-react'; // 뒤로가기 아이콘 추가
+import { User, RefreshCcw, ChevronLeft } from 'lucide-react';
 
 // [시트 설정]
 const QUESTION_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQw9qbxyj6z7z88VGTMXOtXMFU09MuE3U7ekxOToeA9axoovVZLHrJMEIQcz30rWHqLUVlToyOYvQBl/pub?gid=239825276&single=true&output=csv';
@@ -10,6 +10,9 @@ const TYPE_COLORS = {
   '냉정': '#2563eb', '광기': '#dc2626', '활발': '#eab308', '우울': '#9333ea', '순수': '#16a34a', '기타': '#78716c',
   '공명': 'linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff)'
 };
+
+// 폰트 스타일 정의 (대문자 Hungeul 확인)
+const HUNGEUL_STYLE = { fontFamily: 'Hungeul, sans-serif', fontWeight: 'normal' };
 
 function App() {
   const [data, setData] = useState([]);
@@ -108,7 +111,8 @@ function App() {
         }}>
           <div style={{ padding: '20px', backgroundColor: '#f59e0b', borderBottom: '4px solid #000', color: '#fff' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h1 style={{ fontSize: '16px', fontWeight: '900', margin: 0 }}>트릭컬 연회 공략집</h1>
+              {/* 메인 제목 폰트 적용 */}
+              <h1 style={{ ...HUNGEUL_STYLE, fontSize: '22px', margin: 0 }}>트릭컬 연회 공략집</h1>
               <button onClick={fetchData} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}><RefreshCcw size={20} /></button>
             </div>
             <input 
@@ -118,30 +122,36 @@ function App() {
             />
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-            {Object.keys(charGroups).map(type => {
-              const chars = charGroups[type].filter(c => c.includes(searchTerm));
-              if (chars.length === 0) return null;
-              return (
-                <div key={type} style={{ border: '3px solid #000', borderRadius: '12px', marginBottom: '20px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '4px 4px 0px 0px #000' }}>
-                  <div style={{ 
-                    padding: '6px', fontSize: '13px', fontWeight: '900', color: type === '공명' ? '#333' : '#fff', 
-                    background: type === '공명' ? TYPE_COLORS['공명'] : (TYPE_COLORS[type] || '#78716c'),
-                    textAlign: 'center', borderBottom: '3px solid #000' 
-                  }}>{type}</div>
-                  <div style={{ padding: '8px', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: '8px' }}>
-                    {chars.map(name => (
-                      <button key={name} onClick={() => setSelectedChar(name)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px', border: '2px solid #000', borderRadius: '8px', backgroundColor: selectedChar === name ? '#fef3c7' : '#fff', cursor: 'pointer' }}>
-                        <div style={{ width: '45px', height: '45px', borderRadius: '50%', marginBottom: '6px', border: '2px solid #000', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#eee' }}>
-                          {images[name] ? <img src={images[name]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <User size={20} color="#ccc" />}
-                        </div>
-                        <span style={{ fontSize: '11px', fontWeight: 'bold' }}>{name}</span>
-                      </button>
-                    ))}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1 }}>
+              {Object.keys(charGroups).map(type => {
+                const chars = charGroups[type].filter(c => c.includes(searchTerm));
+                if (chars.length === 0) return null;
+                return (
+                  <div key={type} style={{ border: '3px solid #000', borderRadius: '12px', marginBottom: '20px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '4px 4px 0px 0px #000' }}>
+                    <div style={{ 
+                      padding: '6px', fontSize: '13px', fontWeight: '900', color: type === '공명' ? '#333' : '#fff', 
+                      background: type === '공명' ? TYPE_COLORS['공명'] : (TYPE_COLORS[type] || '#78716c'),
+                      textAlign: 'center', borderBottom: '3px solid #000' 
+                    }}>{type}</div>
+                    <div style={{ padding: '8px', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: '8px' }}>
+                      {chars.map(name => (
+                        <button key={name} onClick={() => setSelectedChar(name)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px', border: '2px solid #000', borderRadius: '8px', backgroundColor: selectedChar === name ? '#fef3c7' : '#fff', cursor: 'pointer' }}>
+                          <div style={{ width: '45px', height: '45px', borderRadius: '50%', marginBottom: '6px', border: '2px solid #000', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#eee' }}>
+                            {images[name] ? <img src={images[name]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <User size={20} color="#ccc" />}
+                          </div>
+                          {/* 리스트 사도 이름 폰트 적용 */}
+                          <span style={{ ...HUNGEUL_STYLE, fontSize: '14px' }}>{name}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div style={{ padding: '20px 0', textAlign: 'center', color: '#999', fontSize: '11px', fontWeight: 'bold' }}>
+              All images copyright EPIDGames
+            </div>
           </div>
         </aside>
       )}
@@ -150,41 +160,46 @@ function App() {
       {(!isMobile || (isMobile && selectedChar)) && (
         <main style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '15px' : '40px' }}>
           {selectedChar ? (
-            <div style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: '#fff', border: '5px solid #000', boxShadow: isMobile ? '8px 8px 0px 0px #000' : '15px 15px 0px 0px #000' }}>
-              {/* 모바일용 뒤로가기 바 */}
-              {isMobile && (
-                <button onClick={() => setSelectedChar(null)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '10px', background: '#000', color: '#fff', border: 'none', width: '100%', cursor: 'pointer', fontWeight: 'bold' }}>
-                  <ChevronLeft size={20} /> 목록으로 돌아가기
-                </button>
-              )}
-              
-              <div style={{ 
-                padding: '25px', color: charBase?.type === '공명' ? '#333' : '#fff', 
-                borderBottom: '5px solid #000', background: headerBg, 
-                display: 'flex', alignItems: 'center', gap: '20px' 
-              }}>
-                <div style={{ width: isMobile ? '60px' : '80px', height: isMobile ? '60px' : '80px', border: '4px solid #fff', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {charImg ? <img src={charImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <User size={40} color="#000" />}
+            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+              <div style={{ backgroundColor: '#fff', border: '5px solid #000', boxShadow: isMobile ? '8px 8px 0px 0px #000' : '15px 15px 0px 0px #000', marginBottom: '20px' }}>
+                {isMobile && (
+                  <button onClick={() => setSelectedChar(null)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '12px', background: '#000', color: '#fff', border: 'none', width: '100%', cursor: 'pointer', fontWeight: 'bold' }}>
+                    <ChevronLeft size={20} /> 목록으로 돌아가기
+                  </button>
+                )}
+                
+                <div style={{ 
+                  padding: '25px', color: charBase?.type === '공명' ? '#333' : '#fff', 
+                  borderBottom: '5px solid #000', background: headerBg, 
+                  display: 'flex', alignItems: 'center', gap: '20px' 
+                }}>
+                  <div style={{ width: isMobile ? '60px' : '80px', height: isMobile ? '60px' : '80px', border: '4px solid #fff', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {charImg ? <img src={charImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <User size={40} color="#000" />}
+                  </div>
+                  {/* 상세 화면 사도 이름 폰트 적용 */}
+                  <h2 style={{ ...HUNGEUL_STYLE, fontSize: isMobile ? '32px' : '48px', margin: 0 }}>{selectedChar}</h2>
                 </div>
-                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '900', margin: 0 }}>{selectedChar}</h2>
-              </div>
 
-              <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#000', color: '#fff' }}>
-                    <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%', fontSize: isMobile ? '14px' : '16px' }}>연회 질문 내용</th>
-                    <th style={{ padding: '15px', width: '45%', fontSize: isMobile ? '14px' : '16px' }}>3점 추천 답변</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredLines.map((line, idx) => (
-                    <tr key={idx} style={{ borderBottom: '3px solid #000' }}>
-                      <td style={{ padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '14px' : '17px', fontWeight: 'bold', borderRight: '3px solid #000', backgroundColor: '#fffde6', wordBreak: 'keep-all' }}>{line.question}</td>
-                      <td style={{ padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '15px' : '18px', fontWeight: '900', backgroundColor: '#f0fff4', textAlign: 'center', color: '#14532d', wordBreak: 'keep-all' }}>{line.answer}</td>
+                <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#000', color: '#fff' }}>
+                      <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%', fontSize: isMobile ? '14px' : '16px' }}>연회 질문 내용</th>
+                      <th style={{ padding: '15px', width: '45%', fontSize: isMobile ? '14px' : '16px' }}>3점 추천 답변</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredLines.map((line, idx) => (
+                      <tr key={idx} style={{ borderBottom: '3px solid #000' }}>
+                        <td style={{ padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '14px' : '17px', fontWeight: 'bold', borderRight: '3px solid #000', backgroundColor: '#fffde6', wordBreak: 'keep-all' }}>{line.question}</td>
+                        <td style={{ padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '15px' : '18px', fontWeight: '900', backgroundColor: '#f0fff4', textAlign: 'center', color: '#14532d', wordBreak: 'keep-all' }}>{line.answer}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ textAlign: 'center', color: '#999', fontSize: '11px', fontWeight: 'bold', paddingBottom: '30px' }}>
+                All images copyright EPIDGames
+              </div>
             </div>
           ) : (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
