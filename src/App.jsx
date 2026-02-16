@@ -183,8 +183,8 @@ function App() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#000', color: '#fff' }}>
-                      <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%', fontSize: isMobile ? '14px' : '16px' }}>연회 질문 내용</th>
-                      <th style={{ padding: '15px', width: '45%', fontSize: isMobile ? '14px' : '16px' }}>3점 추천 답변</th>
+                      <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%', fontSize: isMobile ? '14px' : '16px' }}>사도의 대사</th>
+                      <th style={{ padding: '15px', width: '45%', fontSize: isMobile ? '14px' : '16px' }}>교주의 3점 답변</th>
                     </tr>
                   </thead>
                   <tbody>
