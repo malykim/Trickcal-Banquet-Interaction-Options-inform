@@ -1,4 +1,4 @@
-# 🎭 트릭컬 - 연회 상호작용 공략집
+# 트릭컬 - 연회 상호작용 공략집
 
 ## 🔗 바로가기
 **[👉 공략집 웹사이트 접속하기](https://trickcal-banquet-interaction-option.vercel.app/)**
