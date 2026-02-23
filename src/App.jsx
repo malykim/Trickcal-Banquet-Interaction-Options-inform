@@ -17,7 +17,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
-  // 폰트 상태 (기본값: true = 헌글, false = 기본폰트)
   const [isHungeul, setIsHungeul] = useState(() => {
     const saved = localStorage.getItem('font-setting');
     return saved !== null ? JSON.parse(saved) : true;
@@ -33,7 +32,6 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 동적 폰트 스타일 적용 함수
   const getFontStyle = (isTitle = false) => ({
     fontFamily: isHungeul ? 'Hungeul, sans-serif' : 'sans-serif',
     fontWeight: isHungeul ? 'normal' : (isTitle ? '900' : 'bold'),
@@ -93,7 +91,6 @@ function App() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <h1 style={{ ...getFontStyle(true), fontSize: '20px', margin: 0 }}>트릭컬 연회 공략집</h1>
               <div style={{ display: 'flex', gap: '10px' }}>
-                {/* 폰트 토글 버튼 */}
                 <button 
                   onClick={() => setIsHungeul(!isHungeul)} 
                   title="폰트 변경"
@@ -113,7 +110,18 @@ function App() {
               if (chars.length === 0) return null;
               return (
                 <div key={type} style={{ border: '3px solid #000', borderRadius: '12px', marginBottom: '20px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '4px 4px 0px 0px #000' }}>
-                  <div style={{ padding: '6px', fontSize: '13px', fontWeight: '900', color: type === '공명' ? '#333' : '#fff', background: type === '공명' ? TYPE_COLORS['공명'] : (TYPE_COLORS[type] || '#78716c'), textAlign: 'center', borderBottom: '3px solid #000' }}>{type}</div>
+                  {/* 성격(속성) 이름 영역 - 폰트 적용 수정됨 */}
+                  <div style={{ 
+                    ...getFontStyle(true),
+                    padding: '6px', 
+                    fontSize: '15px', 
+                    color: type === '공명' ? '#333' : '#fff', 
+                    background: type === '공명' ? TYPE_COLORS['공명'] : (TYPE_COLORS[type] || '#78716c'), 
+                    textAlign: 'center', 
+                    borderBottom: '3px solid #000' 
+                  }}>
+                    {type}
+                  </div>
                   <div style={{ padding: '8px', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: '8px' }}>
                     {chars.map(name => (
                       <button key={name} onClick={() => setSelectedChar(name)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px', border: '2px solid #000', borderRadius: '8px', backgroundColor: selectedChar === name ? '#fef3c7' : '#fff', cursor: 'pointer' }}>
