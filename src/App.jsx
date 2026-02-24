@@ -156,8 +156,8 @@ function App() {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#000', color: '#fff' }}>
-                      <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%' }}>연회 질문 내용</th>
-                      <th style={{ padding: '15px', width: '45%' }}>3점 추천 답변</th>
+                      <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%' }}>사도의 대사</th>
+                      <th style={{ padding: '15px', width: '45%' }}>교주의 선택지</th>
                     </tr>
                   </thead>
                   <tbody>
