@@ -78,7 +78,16 @@ function App() {
   const filteredLines = data.filter(item => item.charName === selectedChar);
   const charBase = data.find(d => d.charName === selectedChar);
   const headerBg = charBase?.type === '공명' ? TYPE_COLORS['공명'] : (charBase ? TYPE_COLORS[charBase.type] : '#000');
-  const getCharImgPath = (name) => `/images/${name}.png`;
+
+  // 🎭 만우절 이미지 경로 판단 로직
+  const getCharImgPath = (name) => {
+    const now = new Date();
+    const isAprilFool = true; // 4월 1일 (JS는 0부터 시작해서 3이 4월)
+    
+    // 만우절이면 images_BV 폴더에서, 아니면 일반 images 폴더에서 불러옴
+    const folder = isAprilFool ? 'images_BV' : 'images';
+    return `/${folder}/${name}.png`;
+  };
 
   if (loading) return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>데이터 동기화 중...</div>;
 
@@ -110,18 +119,7 @@ function App() {
               if (chars.length === 0) return null;
               return (
                 <div key={type} style={{ border: '3px solid #000', borderRadius: '12px', marginBottom: '20px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '4px 4px 0px 0px #000' }}>
-                  {/* 성격(속성) 이름 영역 - 폰트 적용 수정됨 */}
-                  <div style={{ 
-                    ...getFontStyle(true),
-                    padding: '6px', 
-                    fontSize: '15px', 
-                    color: type === '공명' ? '#333' : '#fff', 
-                    background: type === '공명' ? TYPE_COLORS['공명'] : (TYPE_COLORS[type] || '#78716c'), 
-                    textAlign: 'center', 
-                    borderBottom: '3px solid #000' 
-                  }}>
-                    {type}
-                  </div>
+                  <div style={{ ...getFontStyle(true), padding: '6px', fontSize: '15px', color: type === '공명' ? '#333' : '#fff', background: type === '공명' ? TYPE_COLORS['공명'] : (TYPE_COLORS[type] || '#78716c'), textAlign: 'center', borderBottom: '3px solid #000' }}>{type}</div>
                   <div style={{ padding: '8px', display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: '8px' }}>
                     {chars.map(name => (
                       <button key={name} onClick={() => setSelectedChar(name)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px', border: '2px solid #000', borderRadius: '8px', backgroundColor: selectedChar === name ? '#fef3c7' : '#fff', cursor: 'pointer' }}>
@@ -156,8 +154,8 @@ function App() {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#000', color: '#fff' }}>
-                      <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%' }}>사도의 대사</th>
-                      <th style={{ padding: '15px', width: '45%' }}>교주의 선택지</th>
+                      <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%' }}>사도의 질문</th>
+                      <th style={{ padding: '15px', width: '45%' }}>교주의 답변</th>
                     </tr>
                   </thead>
                   <tbody>
