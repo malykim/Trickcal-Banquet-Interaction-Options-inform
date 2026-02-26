@@ -82,7 +82,7 @@ function App() {
   // 🎭 만우절 이미지 경로 판단 로직
   const getCharImgPath = (name) => {
     const now = new Date();
-    const isAprilFool = true; // 4월 1일 (JS는 0부터 시작해서 3이 4월)
+    const isAprilFool = now.getMonth() === 3 && now.getDate() === 1; // 4월 1일 (JS는 0부터 시작해서 3이 4월)
     
     // 만우절이면 images_BV 폴더에서, 아니면 일반 images 폴더에서 불러옴
     const folder = isAprilFool ? 'images_BV' : 'images';
