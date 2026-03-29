@@ -32,13 +32,12 @@ const decomposeHangul = (str) => {
 };
 
 const getChosung = (str) => {
-  const CHOSUNG = [
-    'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
-  ];
+  const CHOSUNG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
   let result = "";
   for (let i = 0; i < str.length; i++) {
     const code = str.charCodeAt(i) - 44032;
     if (code >= 0 && code <= 11171) {
+      // 받침(종성)은 계산에서 아예 제외하고 초성 인덱스만 가져옵니다.
       result += CHOSUNG[Math.floor(code / 588)];
     } else {
       result += str[i];
@@ -161,18 +160,20 @@ function App() {
             const chars = charGroups[type].filter(name => {
                 if (!searchTerm) return true;
                 
-                const decomposedName = decomposeHangul(name.toLowerCase());
-                const decomposedSearch = decomposeHangul(searchTerm.toLowerCase());
-                
+                const lowerName = name.toLowerCase();
+                const lowerSearch = searchTerm.toLowerCase();
+
                 // 1. 일반 검색 (벨ㄹ -> 벨라, 벨리타)
+                const decomposedName = decomposeHangul(lowerName);
+                const decomposedSearch = decomposeHangul(lowerSearch);
                 if (decomposedName.includes(decomposedSearch)) return true;
                 
-                // 2. 정밀 초성 검색 (ㄴㅌ -> 아네트는 OK, 칸타는 NO)
+                // 2. 초성 검색 (ㄴㅌ -> 아네트 OK, 칸타 NO)
                 const isChosungSearch = /^([ㄱ-ㅎ]+)$/.test(searchTerm);
                 if (isChosungSearch) {
-                  const chosungName = getChosung(name);
-                  // 이름의 초성 흐름 속에 검색어가 "연속해서" 포함되어 있는지 확인
-                  return chosungName.includes(searchTerm);
+                  const chosungName = getChosung(lowerName);
+                  // 이름의 초성에 검색어가 "연속해서" 포함되어 있는지 확인
+                  return chosungName.includes(lowerSearch);
                 }
                 
                 return false;
