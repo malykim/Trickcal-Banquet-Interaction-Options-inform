@@ -142,7 +142,7 @@ function App() {
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
             {Object.keys(charGroups).map(type => {
-            const chars = charGroups[type].filter(name => {
+             const chars = charGroups[type].filter(name => {
                 if (!searchTerm) return true;
                 const decomposedName = decomposeHangul(name.toLowerCase());
                 const decomposedSearch = decomposeHangul(searchTerm.toLowerCase());
