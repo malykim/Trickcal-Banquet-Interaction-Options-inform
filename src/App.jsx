@@ -4,6 +4,33 @@ import { User, RefreshCcw, ChevronLeft, Type } from 'lucide-react';
 
 const QUESTION_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQw9qbxyj6z7z88VGTMXOtXMFU09MuE3U7ekxOToeA9axoovVZLHrJMEIQcz30rWHqLUVlToyOYvQBl/pub?gid=239825276&single=true&output=csv';
 
+// 한글 자음/모음 분해 함수
+const decomposeHangul = (str) => {
+  const CHOSUNG = [
+    'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+  ];
+  const JUNGSUNG = [
+    'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'
+  ];
+  const JONGSUNG = [
+    '', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+  ];
+
+  let result = "";
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i) - 44032;
+    if (code > -1 && code < 11172) {
+      const cho = Math.floor(code / 588);
+      const jung = Math.floor((code % 588) / 28);
+      const jong = code % 28;
+      result += CHOSUNG[cho] + JUNGUNG[jung] + (JONGSUNG[jong] || "");
+    } else {
+      result += str[i]; // 한글이 아니면 그대로 유지
+    }
+  }
+  return result;
+};
+
 const TYPE_COLORS = {
   '냉정': '#2563eb', '광기': '#dc2626', '활발': '#eab308', '우울': '#9333ea', '순수': '#16a34a', '기타': '#78716c',
   '공명': 'linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff)'
@@ -115,7 +142,13 @@ function App() {
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
             {Object.keys(charGroups).map(type => {
-              const chars = charGroups[type].filter(c => c.includes(searchTerm));
+            const chars = charGroups[type].filter(name => {
+                if (!searchTerm) return true;
+                const decomposedName = decomposeHangul(name.toLowerCase());
+                const decomposedSearch = decomposeHangul(searchTerm.toLowerCase());
+                return decomposedName.includes(decomposedSearch);
+              });
+              
               if (chars.length === 0) return null;
               return (
                 <div key={type} style={{ border: '3px solid #000', borderRadius: '12px', marginBottom: '20px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '4px 4px 0px 0px #000' }}>
