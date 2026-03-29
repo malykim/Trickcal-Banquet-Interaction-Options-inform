@@ -142,7 +142,7 @@ function App() {
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
             {Object.keys(charGroups).map(type => {
-             const chars = charGroups[type].filter(name => {
+              const chars = charGroups[type].filter(name => {
                 if (!searchTerm) return true;
                 const decomposedName = decomposeHangul(name.toLowerCase());
                 const decomposedSearch = decomposeHangul(searchTerm.toLowerCase());
@@ -150,6 +150,7 @@ function App() {
               });
               
               if (chars.length === 0) return null;
+
               return (
                 <div key={type} style={{ border: '3px solid #000', borderRadius: '12px', marginBottom: '20px', overflow: 'hidden', backgroundColor: '#fff', boxShadow: '4px 4px 0px 0px #000' }}>
                   <div style={{ ...getFontStyle(true), padding: '6px', fontSize: '15px', color: type === '공명' ? '#333' : '#fff', background: type === '공명' ? TYPE_COLORS['공명'] : (TYPE_COLORS[type] || '#78716c'), textAlign: 'center', borderBottom: '3px solid #000' }}>{type}</div>
@@ -169,7 +170,7 @@ function App() {
           </div>
         </aside>
       )}
-
+      
       {(!isMobile || (isMobile && selectedChar)) && (
         <main style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '15px' : '40px' }}>
           {selectedChar ? (
