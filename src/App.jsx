@@ -158,20 +158,20 @@ function App() {
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
             {Object.keys(charGroups).map(type => {
-             const chars = charGroups[type].filter(name => {
+            const chars = charGroups[type].filter(name => {
                 if (!searchTerm) return true;
                 
                 const decomposedName = decomposeHangul(name.toLowerCase());
                 const decomposedSearch = decomposeHangul(searchTerm.toLowerCase());
                 
-                // 1. 일반적인 포함 검색 (베 -> 벨리타, 벨ㄹ -> 벨라 등)
+                // 1. 일반 검색 (벨ㄹ -> 벨라, 벨리타)
                 if (decomposedName.includes(decomposedSearch)) return true;
                 
-                // 2. 초성 검색 추가 (ㅇㄹㅍ -> 에르핀)
-                // 검색어가 오직 초성으로만 이루어져 있는지 확인
+                // 2. 정밀 초성 검색 (ㄴㅌ -> 아네트는 OK, 칸타는 NO)
                 const isChosungSearch = /^([ㄱ-ㅎ]+)$/.test(searchTerm);
                 if (isChosungSearch) {
                   const chosungName = getChosung(name);
+                  // 이름의 초성 흐름 속에 검색어가 "연속해서" 포함되어 있는지 확인
                   return chosungName.includes(searchTerm);
                 }
                 
