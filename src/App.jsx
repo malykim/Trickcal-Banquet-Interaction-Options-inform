@@ -31,6 +31,22 @@ const decomposeHangul = (str) => {
   return result;
 };
 
+const getChosung = (str) => {
+  const CHOSUNG = [
+    'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+  ];
+  let result = "";
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i) - 44032;
+    if (code >= 0 && code <= 11171) {
+      result += CHOSUNG[Math.floor(code / 588)];
+    } else {
+      result += str[i];
+    }
+  }
+  return result;
+};
+
 const TYPE_COLORS = {
   '냉정': '#2563eb', '광기': '#dc2626', '활발': '#eab308', '우울': '#9333ea', '순수': '#16a34a', '기타': '#78716c',
   '공명': 'linear-gradient(90deg, #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff)'
@@ -142,11 +158,24 @@ function App() {
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
             {Object.keys(charGroups).map(type => {
-              const chars = charGroups[type].filter(name => {
+             const chars = charGroups[type].filter(name => {
                 if (!searchTerm) return true;
+                
                 const decomposedName = decomposeHangul(name.toLowerCase());
                 const decomposedSearch = decomposeHangul(searchTerm.toLowerCase());
-                return decomposedName.includes(decomposedSearch);
+                
+                // 1. 일반적인 포함 검색 (베 -> 벨리타, 벨ㄹ -> 벨라 등)
+                if (decomposedName.includes(decomposedSearch)) return true;
+                
+                // 2. 초성 검색 추가 (ㅇㄹㅍ -> 에르핀)
+                // 검색어가 오직 초성으로만 이루어져 있는지 확인
+                const isChosungSearch = /^([ㄱ-ㅎ]+)$/.test(searchTerm);
+                if (isChosungSearch) {
+                  const chosungName = getChosung(name);
+                  return chosungName.includes(searchTerm);
+                }
+                
+                return false;
               });
               
               if (chars.length === 0) return null;
