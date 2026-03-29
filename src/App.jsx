@@ -32,12 +32,13 @@ const decomposeHangul = (str) => {
 };
 
 const getChosung = (str) => {
+  if (!str) return "";
   const CHOSUNG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
   let result = "";
   for (let i = 0; i < str.length; i++) {
     const code = str.charCodeAt(i) - 44032;
     if (code >= 0 && code <= 11171) {
-      // 받침(종성)은 계산에서 아예 제외하고 초성 인덱스만 가져옵니다.
+      // 588로 나눈 몫이 정확히 초성의 인덱스입니다. (받침은 계산 안 됨)
       result += CHOSUNG[Math.floor(code / 588)];
     } else {
       result += str[i];
@@ -163,20 +164,18 @@ function App() {
                 const lowerName = name.toLowerCase();
                 const lowerSearch = searchTerm.toLowerCase();
 
-                // 1. 일반 검색 (벨ㄹ -> 벨라, 벨리타)
-                const decomposedName = decomposeHangul(lowerName);
-                const decomposedSearch = decomposeHangul(lowerSearch);
-                if (decomposedName.includes(decomposedSearch)) return true;
-                
-                // 2. 초성 검색 (ㄴㅌ -> 아네트 OK, 칸타 NO)
-                const isChosungSearch = /^([ㄱ-ㅎ]+)$/.test(searchTerm);
+                // 1. 초성만 입력했을 때 (예: ㄹㄹ, ㄴㅌ)
+                const isChosungSearch = /^([ㄱ-ㅎ]+)$/.test(lowerSearch);
                 if (isChosungSearch) {
                   const chosungName = getChosung(lowerName);
-                  // 이름의 초성에 검색어가 "연속해서" 포함되어 있는지 확인
+                  // 이름의 "진짜 초성"에 검색어가 연속해서 포함되는지 확인
                   return chosungName.includes(lowerSearch);
                 }
-                
-                return false;
+
+                // 2. 일반 입력 중일 때 (예: 벨ㄹ, 에르)
+                const decomposedName = decomposeHangul(lowerName);
+                const decomposedSearch = decomposeHangul(lowerSearch);
+                return decomposedName.includes(decomposedSearch);
               });
               
               if (chars.length === 0) return null;
