@@ -23,7 +23,7 @@ const decomposeHangul = (str) => {
       const cho = Math.floor(code / 588);
       const jung = Math.floor((code % 588) / 28);
       const jong = code % 28;
-      result += CHOSUNG[cho] + JUNGUNG[jung] + (JONGSUNG[jong] || "");
+      result += CHOSUNG[cho] + JUNGSUNG[jung] + (JONGSUNG[jong] || "");
     } else {
       result += str[i]; // 한글이 아니면 그대로 유지
     }
