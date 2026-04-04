@@ -206,10 +206,7 @@ function App() {
         <aside style={{ width: isMobile ? '100%' : '320px', height: '100%', backgroundColor: '#fff', borderRight: isMobile ? 'none' : '4px solid #000', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
           <div style={{ padding: '20px', backgroundColor: '#f59e0b', borderBottom: '4px solid #000', color: '#fff' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <img src="/favicon.png" alt="로고" style={{ height: '32px', width: 'auto', borderRadius: '4px', border: '2px solid #000' }} />
-                <h1 style={{ ...getFontStyle(true), fontSize: '18px', margin: 0 }}>연회 공략집</h1>
-              </div>
+              <h1 style={{ ...getFontStyle(true), fontSize: '18px', margin: 0 }}>트릭컬 연회장 공략집</h1>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button onClick={() => setIsHungeul(!isHungeul)} title="폰트 변경" style={{ background: '#fff', border: '2px solid #000', color: '#000', cursor: 'pointer', padding: '4px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Type size={18} /></button>
                 <button onClick={fetchData} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}><RefreshCcw size={20} /></button>
