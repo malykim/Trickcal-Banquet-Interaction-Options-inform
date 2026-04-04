@@ -272,11 +272,8 @@ function App() {
                         <img src={getCharImgPath(item.charName)} alt="" style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid #000', backgroundColor: '#eee' }} onError={(e) => { e.target.src = 'https://via.placeholder.com/32?text=?'; }} />
                         <span style={{ ...getFontStyle(), fontWeight: 'bold', fontSize: '15px' }}>{item.charName}</span>
                       </div>
-                      <div style={{ ...getFontStyle(), fontSize: '14px', fontWeight: 'bold', marginBottom: '8px', color: '#b91c1c', wordBreak: 'keep-all', lineHeight: '1.4' }}>
+                      <div style={{ ...getFontStyle(), fontSize: '14px', fontWeight: 'bold', color: '#b91c1c', wordBreak: 'keep-all', lineHeight: '1.4' }}>
                         <span style={{ color: '#000', marginRight: '4px' }}>Q.</span>{item.question}
-                      </div>
-                      <div style={{ ...getFontStyle(), fontSize: '15px', fontWeight: '900', color: '#15803d', wordBreak: 'keep-all', lineHeight: '1.4', backgroundColor: '#f0fff4', padding: '6px', borderRadius: '4px', border: '1px solid #bbf7d0' }}>
-                        <span style={{ color: '#000', marginRight: '4px' }}>A.</span>{item.answer}
                       </div>
                     </div>
                   ))
