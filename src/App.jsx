@@ -57,6 +57,7 @@ function App() {
   const [charGroups, setCharGroups] = useState({});
   const [selectedChar, setSelectedChar] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchMode, setSearchMode] = useState('char'); // 'char' | 'dialogue' 모드 상태 추가
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
@@ -125,12 +126,19 @@ function App() {
   // 🎭 만우절 이미지 경로 판단 로직
   const getCharImgPath = (name) => {
     const now = new Date();
-    const isAprilFool = now.getMonth() === 3 && now.getDate() === 1; // 4월 1일 (JS는 0부터 시작해서 3이 4월)
-    
-    // 만우절이면 images_BV 폴더에서, 아니면 일반 images 폴더에서 불러옴
+    const isAprilFool = now.getMonth() === 3 && now.getDate() === 1; // 4월 1일
     const folder = isAprilFool ? 'images_BV' : 'images';
     return `/${folder}/${name}.png`;
   };
+
+  // 💬 대사 검색 필터링 로직 (자모 분리 적용)
+  const filteredDialogues = searchMode === 'dialogue' && searchTerm
+    ? data.filter(item => {
+        const decomposedQ = decomposeHangul(item.question.toLowerCase());
+        const decomposedSearch = decomposeHangul(searchTerm.toLowerCase());
+        return decomposedQ.includes(decomposedSearch);
+      })
+    : [];
 
   if (loading) return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>데이터 동기화 중...</div>;
 
@@ -153,26 +161,45 @@ function App() {
                 <button onClick={fetchData} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}><RefreshCcw size={20} /></button>
               </div>
             </div>
-            <input type="text" placeholder="사도 이름 검색..." style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '2px solid #000', outline: 'none', color: '#000', boxSizing: 'border-box' }} onChange={(e) => setSearchTerm(e.target.value)} />
+
+            {/* 🔄 검색 모드 전환 토글 버튼 */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+              <button 
+                onClick={() => { setSearchMode('char'); setSearchTerm(''); }} 
+                style={{ ...getFontStyle(), flex: 1, padding: '8px', background: searchMode === 'char' ? '#fff' : 'transparent', color: searchMode === 'char' ? '#f59e0b' : '#fff', border: searchMode === 'char' ? '2px solid #000' : '2px solid #fff', borderRadius: '8px', fontSize: '14px', cursor: 'pointer' }}>
+                👤 사도 검색
+              </button>
+              <button 
+                onClick={() => { setSearchMode('dialogue'); setSearchTerm(''); }} 
+                style={{ ...getFontStyle(), flex: 1, padding: '8px', background: searchMode === 'dialogue' ? '#fff' : 'transparent', color: searchMode === 'dialogue' ? '#f59e0b' : '#fff', border: searchMode === 'dialogue' ? '2px solid #000' : '2px solid #fff', borderRadius: '8px', fontSize: '14px', cursor: 'pointer' }}>
+                💬 대사 검색
+              </button>
+            </div>
+
+            <input 
+              type="text" 
+              placeholder={searchMode === 'char' ? "사도 이름 검색..." : "대사 내용 검색..."} 
+              value={searchTerm}
+              style={{ ...getFontStyle(), width: '100%', padding: '10px', borderRadius: '4px', border: '2px solid #000', outline: 'none', color: '#000', boxSizing: 'border-box' }} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+            />
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-            {Object.keys(charGroups).map(type => {
-            const chars = charGroups[type].filter(name => {
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', backgroundColor: searchMode === 'dialogue' ? '#f3f4f6' : '#fff' }}>
+            
+            {/* 👤 1. 사도 검색 모드일 때 보여줄 화면 */}
+            {searchMode === 'char' && Object.keys(charGroups).map(type => {
+              const chars = charGroups[type].filter(name => {
                 if (!searchTerm) return true;
-                
                 const lowerName = name.toLowerCase();
                 const lowerSearch = searchTerm.toLowerCase();
 
-                // 1. 초성만 입력했을 때 (예: ㄹㄹ, ㄴㅌ)
                 const isChosungSearch = /^([ㄱ-ㅎ]+)$/.test(lowerSearch);
                 if (isChosungSearch) {
                   const chosungName = getChosung(lowerName);
-                  // 이름의 "진짜 초성"에 검색어가 연속해서 포함되는지 확인
                   return chosungName.includes(lowerSearch);
                 }
 
-                // 2. 일반 입력 중일 때 (예: 벨ㄹ, 에르)
                 const decomposedName = decomposeHangul(lowerName);
                 const decomposedSearch = decomposeHangul(lowerSearch);
                 return decomposedName.includes(decomposedSearch);
@@ -196,6 +223,39 @@ function App() {
                 </div>
               );
             })}
+
+            {/* 💬 2. 대사 검색 모드일 때 보여줄 화면 (B안) */}
+            {searchMode === 'dialogue' && (
+              <>
+                {!searchTerm ? (
+                  <div style={{ ...getFontStyle(), textAlign: 'center', color: '#6b7280', marginTop: '40px' }}>검색할 대사를 입력해 주세요.</div>
+                ) : filteredDialogues.length === 0 ? (
+                  <div style={{ ...getFontStyle(), textAlign: 'center', color: '#6b7280', marginTop: '40px' }}>일치하는 대사가 없습니다.</div>
+                ) : (
+                  filteredDialogues.map((item, idx) => (
+                    <div 
+                      key={idx} 
+                      onClick={() => setSelectedChar(item.charName)} 
+                      style={{ border: '3px solid #000', borderRadius: '8px', marginBottom: '12px', backgroundColor: '#fff', padding: '12px', cursor: 'pointer', boxShadow: '3px 3px 0px 0px #000', transition: 'transform 0.1s' }}
+                      onMouseDown={(e) => e.currentTarget.style.transform = 'translate(2px, 2px)'}
+                      onMouseUp={(e) => e.currentTarget.style.transform = 'none'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'none'}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', borderBottom: '2px dashed #e5e7eb', paddingBottom: '8px' }}>
+                        <img src={getCharImgPath(item.charName)} alt="" style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid #000', backgroundColor: '#eee' }} onError={(e) => { e.target.src = 'https://via.placeholder.com/32?text=?'; }} />
+                        <span style={{ ...getFontStyle(), fontWeight: 'bold', fontSize: '15px' }}>{item.charName}</span>
+                      </div>
+                      <div style={{ ...getFontStyle(), fontSize: '14px', fontWeight: 'bold', marginBottom: '8px', color: '#b91c1c', wordBreak: 'keep-all', lineHeight: '1.4' }}>
+                        <span style={{ color: '#000', marginRight: '4px' }}>Q.</span>{item.question}
+                      </div>
+                      <div style={{ ...getFontStyle(), fontSize: '15px', fontWeight: '900', color: '#15803d', wordBreak: 'keep-all', lineHeight: '1.4', backgroundColor: '#f0fff4', padding: '6px', borderRadius: '4px', border: '1px solid #bbf7d0' }}>
+                        <span style={{ color: '#000', marginRight: '4px' }}>A.</span>{item.answer}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </>
+            )}
           </div>
         </aside>
       )}
@@ -206,7 +266,7 @@ function App() {
             <div style={{ maxWidth: '900px', margin: '0 auto' }}>
               <div style={{ backgroundColor: '#fff', border: '5px solid #000', boxShadow: isMobile ? '8px 8px 0px 0px #000' : '15px 15px 0px 0px #000', marginBottom: '20px' }}>
                 {isMobile && (
-                  <button onClick={() => setSelectedChar(null)} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '12px', background: '#000', color: '#fff', border: 'none', width: '100%', cursor: 'pointer', fontWeight: 'bold' }}><ChevronLeft size={20} /> 목록으로 돌아가기</button>
+                  <button onClick={() => setSelectedChar(null)} style={{ ...getFontStyle(), display: 'flex', alignItems: 'center', gap: '5px', padding: '12px', background: '#000', color: '#fff', border: 'none', width: '100%', cursor: 'pointer', fontWeight: 'bold' }}><ChevronLeft size={20} /> 목록으로 돌아가기</button>
                 )}
                 <div style={{ padding: '25px', color: charBase?.type === '공명' ? '#333' : '#fff', borderBottom: '5px solid #000', background: headerBg, display: 'flex', alignItems: 'center', gap: '20px' }}>
                   <div style={{ width: isMobile ? '60px' : '80px', height: isMobile ? '60px' : '80px', border: '4px solid #fff', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#fff' }}>
@@ -216,7 +276,7 @@ function App() {
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ backgroundColor: '#000', color: '#fff' }}>
+                    <tr style={{ backgroundColor: '#000', color: '#fff', ...getFontStyle() }}>
                       <th style={{ padding: '15px', borderRight: '3px solid #000', width: '55%' }}>사도의 질문</th>
                       <th style={{ padding: '15px', width: '45%' }}>교주의 답변</th>
                     </tr>
@@ -224,8 +284,8 @@ function App() {
                   <tbody>
                     {filteredLines.map((line, idx) => (
                       <tr key={idx} style={{ borderBottom: '3px solid #000' }}>
-                        <td style={{ padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '14px' : '17px', fontWeight: 'bold', borderRight: '3px solid #000', backgroundColor: '#fffde6', wordBreak: 'keep-all' }}>{line.question}</td>
-                        <td style={{ padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '15px' : '18px', fontWeight: '900', backgroundColor: '#f0fff4', textAlign: 'center', color: '#14532d', wordBreak: 'keep-all' }}>{line.answer}</td>
+                        <td style={{ ...getFontStyle(), padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '14px' : '17px', fontWeight: 'bold', borderRight: '3px solid #000', backgroundColor: '#fffde6', wordBreak: 'keep-all' }}>{line.question}</td>
+                        <td style={{ ...getFontStyle(), padding: isMobile ? '15px' : '25px', fontSize: isMobile ? '15px' : '18px', fontWeight: '900', backgroundColor: '#f0fff4', textAlign: 'center', color: '#14532d', wordBreak: 'keep-all' }}>{line.answer}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -234,7 +294,7 @@ function App() {
             </div>
           ) : (
             <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
-              <User size={150} /><p style={{ fontSize: '32px', fontWeight: '900' }}>사도를 선택해 주세요</p>
+              <User size={150} /><p style={{ ...getFontStyle(), fontSize: '32px', fontWeight: '900' }}>사도를 선택해 주세요</p>
             </div>
           )}
         </main>
