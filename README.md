@@ -13,7 +13,7 @@
 ## 🛠 사용된 기술
 * **Frontend**: React.js, Vite
 * **Data**: Google Sheets API (via PapaParse)
-* **Deployment**: Cloudflare
+* **Deployment**: CloudFlare
 * **Icons**: Lucide-React
 
 ---
